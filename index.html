@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Card Manager - Prog09</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      padding-top: 70px;
+    }
+
+    #navbar nav {
+      background-color: #222;
+      padding: 15px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 999;
+      text-align: center;
+      margin: 0;
+    }
+
+    #navbar nav a {
+      color: white;
+      margin: 0 20px;
+      text-decoration: none;
+      font-weight: bold;
+      font-family: Arial, sans-serif;
+    }
+
+    #navbar nav a:hover {
+      text-decoration: underline;
+    }
+
+    .container {
+      display: flex;
+      padding: 20px;
+    }
+
+    .left {
+      width: 40%;
+      padding: 20px;
+    }
+
+    .right {
+      width: 60%;
+      padding: 20px;
+    }
+
+    .left h1 {
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .left p {
+      margin: 5px 0;
+    }
+
+    .left ul {
+      margin: 10px 0;
+      padding-left: 20px;
+    }
+
+    .left li {
+      margin: 5px 0;
+    }
+
+    .right h2 {
+      color: #333;
+      margin-bottom: 15px;
+    }
+
+    form label {
+      display: block;
+      margin-top: 10px;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    form input {
+      display: block;
+      margin-bottom: 10px;
+      padding: 8px;
+      width: 200px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background-color: #f0f0f0;
+      color: #333;
+      border: 1px solid #ccc;
+      cursor: pointer;
+      padding: 6px 12px;
+      margin: 10px 0;
+    }
+
+    button:hover {
+      background-color: #e0e0e0;
+    }
+
+    #cardDisplay {
+      margin-top: 20px;
+    }
+
+    .card-info {
+      background-color: white;
+      border: 1px solid #ccc;
+      padding: 15px;
+      margin: 10px 0;
+    }
+
+    .card-info p {
+      margin: 5px 0;
+    }
+
+    .card-info strong {
+      font-weight: bold;
+    }
+
+    table {
+      width: 100%;
+      margin-top: 20px;
+      border-collapse: collapse;
+      background-color: white;
+    }
+
+    th, td {
+      padding: 8px;
+      text-align: left;
+      border: 1px solid #ccc;
+    }
+
+    th {
+      background-color: #f5f5f5;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div id="navbar"></div>
+  <div class="container">
+    <div class="left">
+      <h1>Dynamic Business Cards</h1>
+      <p><strong>A demo of Javascript events</strong></p>
+      <ul>
+        <li>Add a new card by pressing 'Add'</li>
+        <li>Display all cards</li>
+      </ul>
+    </div>
+    <div class="right">
+      <h2>Information Form</h2>
+      <form id="cardForm">
+        <label for="name">Name:</label>
+        <input type="text" id="name" required />
+        
+        <label for="email">Email:</label>
+        <input type="email" id="email" required />
+        
+        <label for="address">Address:</label>
+        <input type="text" id="address" required />
+        
+        <label for="phone">Phone:</label>
+        <input type="tel" id="phone" required />
+        
+        <label for="birthdate">Birthdate:</label>
+        <input type="date" id="birthdate" required />
+        
+        <button type="submit">Submit</button>
+      </form>
+      
+      <h2>Business Cards</h2>
+      <button id="showCards">Show Cards</button>
+      <div id="cardDisplay"></div>
+    </div>
+  </div>
+
+  <script>
+    // Card constructor function
+    function Card(name, email, address, phone, birthdate) {
+      this.name = name;
+      this.email = email;
+      this.address = address;
+      this.phone = phone;
+      this.birthdate = birthdate;
+      this.printCard = printCard;
+    }
+
+    // Print card function for table format
+    function printCard() {
+      return `
+        <tr>
+          <td>${this.name}</td>
+          <td>${this.email}</td>
+          <td>${this.address}</td>
+          <td>${this.phone}</td>
+          <td>${this.birthdate}</td>
+        </tr>`;
+    }
+
+    // Print card function for display format (like in screenshot)
+    function printCardDisplay() {
+      return `
+        <div class="card-info">
+          <p><strong>Name:</strong> ${this.name}</p>
+          <p><strong>Email:</strong> ${this.email}</p>
+          <p><strong>Address:</strong> ${this.address}</p>
+          <p><strong>Phone:</strong> ${this.phone}</p>
+          <p><strong>Birthdate:</strong> ${this.birthdate}</p>
+        </div>`;
+    }
+
+    // Main application logic
+    let cards = [];
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const form = document.getElementById("cardForm");
+      const displayBtn = document.getElementById("showCards");
+      const displayArea = document.getElementById("cardDisplay");
+
+      // Handle form submission
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        
+        const name = document.getElementById("name").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const address = document.getElementById("address").value.trim();
+        const phone = document.getElementById("phone").value.trim();
+        const birthdate = document.getElementById("birthdate").value;
+
+        if (!name || !email || !address || !phone || !birthdate) {
+          alert("Please fill in all fields.");
+          return;
+        }
+
+        const newCard = new Card(name, email, address, phone, birthdate);
+        cards.push(newCard);
+        alert("Card added!");
+        form.reset();
+        displayArea.innerHTML = '';
+      });
+
+      // Handle display cards button
+      displayBtn.addEventListener("click", () => {
+        if (cards.length === 0) {
+          displayArea.innerHTML = "<p>No cards to show yet.</p>";
+          return;
+        }
+
+        // Display in the format shown in screenshot
+        let output = '';
+        for (let card of cards) {
+          output += `
+            <div class="card-info">
+              <p><strong>Name:</strong> ${card.name}</p>
+              <p><strong>Email:</strong> ${card.email}</p>
+              <p><strong>Address:</strong> ${card.address}</p>
+              <p><strong>Phone:</strong> ${card.phone}</p>
+              <p><strong>Birthdate:</strong> ${card.birthdate}</p>
+            </div>`;
+        }
+        displayArea.innerHTML = output;
+      });
+    });
+
+    // Navbar loading (if you have navbar.html)
+    window.addEventListener('DOMContentLoaded', () => {
+      fetch('../navbar.html')
+        .then(res => res.text())
+        .then(data => {
+          document.getElementById('navbar').innerHTML = data;
+        })
+        .catch(err => {
+          // If navbar.html doesn't exist, create a simple navbar
+          document.getElementById('navbar').innerHTML = `
+            <nav>
+              <a href="#">Home</a>
+              <a href="#">About</a>
+              <a href="#">Contact</a>
+            </nav>`;
+        });
+    });
+  </script>
+</body>
+</html>
